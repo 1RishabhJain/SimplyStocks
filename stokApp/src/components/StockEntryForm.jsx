@@ -53,7 +53,26 @@ export default function StockEntryForm({
   syncWidget,
   csvData,
 }) {
-  // Adjusted functions to use the passed `csvData`
+  // Filter symbol and name options based on the selected sector
+  const filteredSymbolOptions = stockSector
+    ? symbolOptions.filter((opt) =>
+        csvData.some((row) => row.Symbol === opt.value && row.Sector === stockSector)
+      )
+    : symbolOptions;
+
+  const filteredNameOptions = stockSector
+    ? nameOptions.filter((opt) =>
+        csvData.some((row) => row.Name === opt.value && row.Sector === stockSector)
+      )
+    : nameOptions;
+
+  // Unified function to reset all fields
+  const resetFields = () => {
+    setSymbol("");
+    setStockName("");
+    
+  };
+
   const handleSymbolChange = (option) => {
     if (option) {
       const selectedRow = csvData.find((row) => row.Symbol === option.value);
@@ -63,10 +82,7 @@ export default function StockEntryForm({
         setSector(selectedRow.Sector);
       }
     } else {
-      // Clear all selects
-      setSymbol("");
-      setStockName("");
-      setSector("");
+      resetFields(); // Clear all dropdowns if Symbol is cleared
     }
   };
 
@@ -79,63 +95,56 @@ export default function StockEntryForm({
         setSector(selectedRow.Sector);
       }
     } else {
-      // Clear all selects
-      setSymbol("");
-      setStockName("");
-      setSector("");
+      resetFields(); // Clear all dropdowns if Name is cleared
     }
   };
 
   const handleSectorChange = (option) => {
     if (option) {
-      const selectedRow = csvData.find((row) => row.Sector === option.value);
-      if (selectedRow) {
-        setSymbol(selectedRow.Symbol);
-        setStockName(selectedRow.Name);
-        setSector(selectedRow.Sector);
-      }
-    } else {
-      // Clear all selects
+      const selectedSector = option.value;
+      setSector(selectedSector);
+
+      // Reset dependent fields
       setSymbol("");
       setStockName("");
+    } else {
+      resetFields(); // Clear all dropdowns if Sector is cleared
       setSector("");
     }
   };
 
   return (
     <section className="flex mb-4 sm:flex-col md:flex-row gap-2">
-   <Select
-  options={symbolOptions}
-  value={symbolOptions.find((opt) => opt.value === stockSymbol) || null}  // Set to null if no symbol is selected
-  onChange={(option) => handleSymbolChange(option)}
-  isSearchable
-  isClearable
-  placeholder="Select stock symbol"
-  styles={customStyles}
-  maxMenuHeight={150}
-/>
-
-<Select
-  options={nameOptions}
-  value={nameOptions.find((opt) => opt.value === stockName) || null}  // Set to null if no name is selected
-  onChange={(option) => handleNameChange(option)}
-  isSearchable
-  isClearable
-  placeholder="Select stock name"
-  styles={customStyles}
-  maxMenuHeight={150}
-/>
-
-<Select
-  options={sectorOptions}
-  value={sectorOptions.find((opt) => opt.value === stockSector) || null}  // Set to null if no sector is selected
-  onChange={(option) => handleSectorChange(option)}
-  isSearchable
-  isClearable
-  placeholder="Select stock sector"
-  styles={customStyles}
-  maxMenuHeight={150}
-/>
+      <Select
+        options={filteredSymbolOptions}
+        value={filteredSymbolOptions.find((opt) => opt.value === stockSymbol) || null}
+        onChange={(option) => handleSymbolChange(option)}
+        isSearchable
+        isClearable
+        placeholder="Select stock symbol"
+        styles={customStyles}
+        maxMenuHeight={150}
+      />
+      <Select
+        options={filteredNameOptions}
+        value={filteredNameOptions.find((opt) => opt.value === stockName) || null}
+        onChange={(option) => handleNameChange(option)}
+        isSearchable
+        isClearable
+        placeholder="Select stock name"
+        styles={customStyles}
+        maxMenuHeight={150}
+      />
+      <Select
+        options={sectorOptions}
+        value={sectorOptions.find((opt) => opt.value === stockSector) || null}
+        onChange={(option) => handleSectorChange(option)}
+        isSearchable
+        isClearable
+        placeholder="Select stock sector"
+        styles={customStyles}
+        maxMenuHeight={150}
+      />
       <ActionButton
         classes="bg-violet-600 hover:bg-violet-950"
         onClick={() => handleAddStock()}
