@@ -19,13 +19,13 @@ const Plotter = ({ apikey, symbol }) => {
   const [error, setError] = useState(null);
 
   // Base URL for the API
-  const BASE_URL = "http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com";
+  const BASE_URL = "http://t12-env.eba-pkqpyn5m.us-east-2.elasticbeanstalk.com/";
 
   useEffect(() => {
     const fetchStockData = async () => {
       try {
         // Construct the full URL with parameters
-        const url = `http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
+        const url = `http://t12-env.eba-pkqpyn5m.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
         console.log(url);
         
         const response = await fetch(url, {
