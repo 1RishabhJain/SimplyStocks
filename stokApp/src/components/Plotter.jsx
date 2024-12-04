@@ -25,13 +25,12 @@ const Plotter = ({ apikey, symbol }) => {
     const fetchStockData = async () => {
       try {
         // Construct the full URL with parameters
-        const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
-        const url = `${CORS_PROXY}http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
-        console.log(url)
+        const url = `http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
+        console.log(url);
+        
         const response = await fetch(url, {
           method: 'GET',
           headers: {
-            'Origin': 'http://localhost:5173', // Specify your frontend origin
             'X-Requested-With': 'XMLHttpRequest', // Indicates the request is made via AJAX
           },
         });
@@ -71,6 +70,7 @@ const Plotter = ({ apikey, symbol }) => {
 
     fetchStockData();
   }, [apikey, symbol]);
+
 
   const options = {
     responsive: true,
