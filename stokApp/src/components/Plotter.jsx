@@ -35,13 +35,13 @@ const Plotter = ({ apikey, symbol }) => {
             'X-Requested-With': 'XMLHttpRequest', // Indicates the request is made via AJAX
           },
         });
-
+        
         if (!response.ok) {
           throw new Error(`Error: ${response.status}`);
         }
         
         const data = await response.json();
-
+        console.log(data);
         // Process data for chart rendering
         const timeSeries = data['Time Series (Daily)'];
         const dates = Object.keys(timeSeries).reverse(); // Dates in ascending order

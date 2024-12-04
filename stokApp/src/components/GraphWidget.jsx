@@ -19,7 +19,7 @@ export default function GraphWidget({ symbol }) {
           "style": "1",
           "locale": "en",
           "withdateranges": true,
-          "height": "450",
+          "height": "700",
           "backgroundColor": "rgba(53, 28, 117, 1)",
           "gridColor": "rgba(255, 255, 255, 0.06)",
           "allow_symbol_change": true,

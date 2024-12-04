@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import ActionButton from "./ActionButton";
 import { AiFillPlusCircle } from "react-icons/ai";
 import { MdSearch } from "react-icons/md";
-import Select from "react-select";
+import CreatableSelect from "react-select/creatable";
 
 const customStyles = {
   menu: (provided) => ({
@@ -48,7 +48,9 @@ export default function StockEntryForm({
   setSector,
   handleAddStock,
   symbolOptions,
+  setSymbolOptions,
   nameOptions,
+  setNameOptions,
   sectorOptions,
   syncWidget,
   csvData,
@@ -70,7 +72,7 @@ export default function StockEntryForm({
   const resetFields = () => {
     setSymbol("");
     setStockName("");
-    
+    setSector("");
   };
 
   const handleSymbolChange = (option) => {
@@ -80,9 +82,13 @@ export default function StockEntryForm({
         setSymbol(selectedRow.Symbol);
         setStockName(selectedRow.Name);
         setSector(selectedRow.Sector);
+      } else {
+        setSymbol(option.value);
       }
     } else {
-      resetFields(); // Clear all dropdowns if Symbol is cleared
+      setSymbol("");
+      setStockName("");
+      setSector("");
     }
   };
 
@@ -93,9 +99,13 @@ export default function StockEntryForm({
         setSymbol(selectedRow.Symbol);
         setStockName(selectedRow.Name);
         setSector(selectedRow.Sector);
+      } else {
+        setStockName(option.value);
       }
     } else {
-      resetFields(); // Clear all dropdowns if Name is cleared
+      setSymbol("");
+      setStockName("");
+      setSector("");
     }
   };
 
@@ -108,49 +118,47 @@ export default function StockEntryForm({
       setSymbol("");
       setStockName("");
     } else {
-      resetFields(); // Clear all dropdowns if Sector is cleared
       setSector("");
     }
   };
 
   return (
     <section className="flex mb-4 sm:flex-col md:flex-row gap-2">
-      <Select
+      <CreatableSelect
         options={filteredSymbolOptions}
-        value={filteredSymbolOptions.find((opt) => opt.value === stockSymbol) || null}
-        onChange={(option) => handleSymbolChange(option)}
+        value={stockSymbol ? { value: stockSymbol, label: stockSymbol } : null}
+        onChange={handleSymbolChange}
+        onCreateOption={(inputValue) => setSymbol(inputValue)}
         isSearchable
         isClearable
-        isCreatable
         placeholder="Select stock symbol"
         styles={customStyles}
         maxMenuHeight={150}
       />
-      <Select
+      <CreatableSelect
         options={filteredNameOptions}
-        value={filteredNameOptions.find((opt) => opt.value === stockName) || null}
-        onChange={(option) => handleNameChange(option)}
+        value={stockName ? { value: stockName, label: stockName } : null}
+        onChange={handleNameChange}
+        onCreateOption={(inputValue) => setStockName(inputValue)}
         isSearchable
         isClearable
-        isCreatable
         placeholder="Select stock name"
         styles={customStyles}
         maxMenuHeight={150}
       />
-      <Select
+      <CreatableSelect
         options={sectorOptions}
-        value={sectorOptions.find((opt) => opt.value === stockSector) || null}
-        onChange={(option) => handleSectorChange(option)}
+        value={stockSector ? { value: stockSector, label: stockSector } : null}
+        onChange={handleSectorChange}
         isSearchable
         isClearable
-        isCreatable
         placeholder="Select stock sector"
         styles={customStyles}
         maxMenuHeight={150}
       />
       <ActionButton
         classes="bg-violet-600 hover:bg-violet-950"
-        onClick={() => handleAddStock()}
+        onClick={handleAddStock}
       >
         <AiFillPlusCircle size={25} />
       </ActionButton>

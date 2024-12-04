@@ -9,7 +9,7 @@ import WatchListTable from "../components/WatchListTable";
 import Plotter from "../components/Plotter";
 
 function HomePage() {
-  const [selectedSymbol, setSelectedSymbol] = useState("AAPL"); // Default symbol
+  const [selectedSymbol, setSelectedSymbol] = useState("IBM"); // Default symbol
   const [stockList, setStockList] = useState([]);
   const [inputSymbol, setInputSymbol] = useState("");
   const [inputName, setInputName] = useState("");
@@ -140,12 +140,16 @@ function HomePage() {
     }
   }, [selectedSymbol]);
 
+  const date = new Date();
+  const dateF = date.toLocaleDateString();
   return (
     <div className="w-full min-h-screen flex flex-col xl:flex-row gap-5 text-white bg-gray-800 overflow-y-auto">
       <header className="w-full flex flex-col mt-2">
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold my-3 px-2 py-1 rounded-md text-violet-500">SimplyStocks</h1>
-          <CurrentDate />
+          <div className="text-xl font-bold my-3 px-2 py-1 rounded-md bg-violet-700">
+      {dateF}
+    </div>
         </div>
         <div
           ref={widgetContainerRef}
@@ -153,7 +157,7 @@ function HomePage() {
         ></div>
         <div>
           <h1>Stock Data Visualization</h1>
-          <Plotter apikey="AR8VLH8I12XTCBY0" symbol={selectedSymbol} /> {/* Pass selectedSymbol */}
+          <Plotter apikey="demo" symbol={selectedSymbol} /> {/* Pass selectedSymbol */}
         </div>
         <StockEntryForm
           stockSymbol={inputSymbol}
