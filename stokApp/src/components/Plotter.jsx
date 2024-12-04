@@ -9,38 +9,68 @@ import {
   LinearScale,
   PointElement,
 } from 'chart.js';
-import stockData from '../assets/IBM.json'; // Import JSON file
 
 // Register Chart.js components
 ChartJS.register(LineElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement);
 
-const Plotter = () => {
+const Plotter = ({ apikey, symbol }) => {
   const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Base URL for the API
+  const BASE_URL = "http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com";
 
   useEffect(() => {
-    // Extract data from JSON
-    const timeSeries = stockData['Time Series (Daily)'];
-    const dates = Object.keys(timeSeries).reverse(); // Dates in ascending order
-    const highValues = dates.map((date) => parseFloat(timeSeries[date]['4. close']));
-    const meta = stockData['Meta Data'];
-    const info = meta['1. Information'];
+    const fetchStockData = async () => {
+      try {
+        // Construct the full URL with parameters
+        const CORS_PROXY = "https://cors-anywhere.herokuapp.com/";
+        const url = `${CORS_PROXY}http://t7-env.eba-nqn9uaid.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
+        console.log(url)
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Origin': 'http://localhost:5173', // Specify your frontend origin
+            'X-Requested-With': 'XMLHttpRequest', // Indicates the request is made via AJAX
+          },
+        });
 
-    // Prepare chart data
-    const data = {
-      labels: dates,
-      datasets: [
-        {
-          label: 'High Prices',
-          data: highValues,
-          borderColor: 'rgba(75,192,192,1)',
-          backgroundColor: 'rgba(75,192,192,0.2)',
-          tension: 0.4,
-        },
-      ],
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status}`);
+        }
+        
+        const data = await response.json();
+
+        // Process data for chart rendering
+        const timeSeries = data['Time Series (Daily)'];
+        const dates = Object.keys(timeSeries).reverse(); // Dates in ascending order
+        const highValues = dates.map((date) => parseFloat(timeSeries[date]['4. close']));
+
+        // Prepare chart data
+        const chartData = {
+          labels: dates,
+          datasets: [
+            {
+              label: 'High Prices',
+              data: highValues,
+              borderColor: 'rgba(75,192,192,1)',
+              backgroundColor: 'rgba(75,192,192,0.2)',
+              tension: 0.4,
+            },
+          ],
+        };
+
+        setChartData(chartData);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
     };
 
-    setChartData(data);
-  }, []);
+    fetchStockData();
+  }, [apikey, symbol]);
 
   const options = {
     responsive: true,
@@ -54,13 +84,9 @@ const Plotter = () => {
           label: (tooltipItem) => {
             const index = tooltipItem.dataIndex;
             const date = chartData.labels[index];
-            const dataPoint = stockData['Time Series (Daily)'][date];
+            const dataPoint = chartData.datasets[0].data[index];
             return [
-              `Open: $${parseFloat(dataPoint['1. open']).toFixed(2)}`,
-              `High: $${parseFloat(dataPoint['2. high']).toFixed(2)}`,
-              `Low: $${parseFloat(dataPoint['3. low']).toFixed(2)}`,
-              `Close: $${parseFloat(dataPoint['4. close']).toFixed(2)}`,
-              `Volume: ${parseInt(dataPoint['5. volume']).toLocaleString()}`,
+              `High: $${dataPoint.toFixed(2)}`,
             ];
           },
         },
@@ -86,9 +112,9 @@ const Plotter = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "500px"}}>
-        <h1>info</h1>
-      {chartData ? <Line data={chartData} options={options} /> : <p>Loading...</p>}
+    <div style={{ width: '100%', height: '500px' }}>
+      {loading && <p>Loading...</p>}
+      {chartData && <Line data={chartData} options={options} />}
     </div>
   );
 };

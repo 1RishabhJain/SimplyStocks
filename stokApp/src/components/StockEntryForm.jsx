@@ -121,6 +121,7 @@ export default function StockEntryForm({
         onChange={(option) => handleSymbolChange(option)}
         isSearchable
         isClearable
+        isCreatable
         placeholder="Select stock symbol"
         styles={customStyles}
         maxMenuHeight={150}
@@ -131,6 +132,7 @@ export default function StockEntryForm({
         onChange={(option) => handleNameChange(option)}
         isSearchable
         isClearable
+        isCreatable
         placeholder="Select stock name"
         styles={customStyles}
         maxMenuHeight={150}
@@ -141,6 +143,7 @@ export default function StockEntryForm({
         onChange={(option) => handleSectorChange(option)}
         isSearchable
         isClearable
+        isCreatable
         placeholder="Select stock sector"
         styles={customStyles}
         maxMenuHeight={150}

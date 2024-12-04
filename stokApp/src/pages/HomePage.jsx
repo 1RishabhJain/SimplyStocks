@@ -6,10 +6,10 @@ import GraphWidget from "../components/GraphWidget";
 import StockEntryForm from "../components/StockEntryForm";
 import WatchListHeader from "../components/WatchListHeader";
 import WatchListTable from "../components/WatchListTable";
-import Plotter from '../components/Plotter';
+import Plotter from "../components/Plotter";
 
 function HomePage() {
-  const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
+  const [selectedSymbol, setSelectedSymbol] = useState("AAPL"); // Default symbol
   const [stockList, setStockList] = useState([]);
   const [inputSymbol, setInputSymbol] = useState("");
   const [inputName, setInputName] = useState("");
@@ -21,8 +21,6 @@ function HomePage() {
 
   const widgetContainerRef = useRef(null);
 
-  
-
   // Load stock list from local storage
   useEffect(() => {
     const storedStockList = localStorage.getItem("stockList");
@@ -31,48 +29,34 @@ function HomePage() {
     }
   }, []);
 
-  
+  // Parse CSV data
   useEffect(() => {
     const fetchAndParseCSV = async () => {
       try {
         const response = await fetch("/SP500.csv");
         const csvText = await response.text();
-
         const parsedData = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-        setCsvData(parsedData.data); // Update state here
+        setCsvData(parsedData.data);
       } catch (error) {
         console.error("Error fetching or parsing the CSV file:", error);
       }
     };
-
     fetchAndParseCSV();
   }, []);
 
+  // Update options based on CSV data
   useEffect(() => {
     if (csvData.length > 0) {
-      const symbolOptions = csvData.map((item) => ({
-        value: item.Symbol,
-        label: item.Symbol
-      }));
-
-      const nameOptions = csvData.map((item) => ({
-        value: item.Name,
-        label: item.Name
-      }));
-
-      const sectorOptions = [
-        ...new Set(csvData.map((item) => item.Sector)) // Create unique sectors
-      ].map((sector) => ({
-        value: sector,
-        label: sector
-      }));
-
-      setSymbolOptions(symbolOptions);
-      setNameOptions(nameOptions);
-      setSectorOptions(sectorOptions);
+      setSymbolOptions(csvData.map((item) => ({ value: item.Symbol, label: item.Symbol })));
+      setNameOptions(csvData.map((item) => ({ value: item.Name, label: item.Name })));
+      setSectorOptions(
+        [...new Set(csvData.map((item) => item.Sector))].map((sector) => ({
+          value: sector,
+          label: sector,
+        }))
+      );
     }
   }, [csvData]);
-  
 
   // Save stock list to local storage
   useEffect(() => {
@@ -81,7 +65,7 @@ function HomePage() {
     }
   }, [stockList]);
 
-  // Export stock list to JSON file
+  // Function to export stock list to JSON
   const exportStockList = () => {
     const jsonData = JSON.stringify(stockList, null, 2);
     const dataBlob = new Blob([jsonData], { type: "application/json" });
@@ -92,30 +76,25 @@ function HomePage() {
     downloadLink.click();
   };
 
-  // Add a new stock to the list
+  // Add a new stock
   const addStock = () => {
     if (inputSymbol.trim() && inputName.trim() && inputSector.trim()) {
       const upperSymbol = inputSymbol.toUpperCase();
       if (stockList.some((stock) => stock.symbol === upperSymbol)) {
         alert(`${upperSymbol} already exists in the list!`);
-        
       } else {
-        setStockList([
-          ...stockList,
-          { symbol: upperSymbol, name: inputName, sector: inputSector },
-        ]);
-        displayStockWidget(inputSymbol);
+        setStockList([...stockList, { symbol: upperSymbol, name: inputName, sector: inputSector }]);
+        setSelectedSymbol(inputSymbol); // Update symbol for graph
         setInputSymbol("");
         setInputName("");
         setInputSector("");
-        
       }
     } else {
       alert("Please fill all the fields!");
     }
   };
 
-  // Edit an existing stock
+  // Edit stock details
   const editStock = (symbol, newName, newSector) => {
     const updatedStockList = stockList.map((stock) =>
       stock.symbol === symbol
@@ -125,18 +104,17 @@ function HomePage() {
     setStockList(updatedStockList);
   };
 
-  // Remove a stock from the list
+  // Remove a stock
   const removeStock = (symbol) => {
     if (window.confirm(`Are you sure you want to remove ${symbol}?`)) {
-      const updatedStockList = stockList.filter((stock) => stock.symbol !== symbol);
-      setStockList(updatedStockList);
+      setStockList(stockList.filter((stock) => stock.symbol !== symbol));
     }
   };
 
-  // Open stock details and chart widget
+  // Update widget and graph
   const displayStockWidget = (symbol) => {
     widgetContainerRef.current.scrollIntoView({ behavior: "smooth" });
-    setSelectedSymbol(symbol);
+    setSelectedSymbol(symbol); // Update the graph symbol
   };
 
   // Embed TradingView widget
@@ -169,10 +147,14 @@ function HomePage() {
           <h1 className="text-3xl font-bold my-3 px-2 py-1 rounded-md text-violet-500">SimplyStocks</h1>
           <CurrentDate />
         </div>
+        <div
+          ref={widgetContainerRef}
+          className="tradingview-widget-container__widget rounded-md mb-2 max-h-96 overflow-auto"
+        ></div>
         <div>
-      <h1>Stock Data Visualization</h1>
-      <Plotter />
-    </div>
+          <h1>Stock Data Visualization</h1>
+          <Plotter apikey="AR8VLH8I12XTCBY0" symbol={selectedSymbol} /> {/* Pass selectedSymbol */}
+        </div>
         <StockEntryForm
           stockSymbol={inputSymbol}
           setSymbol={setInputSymbol}
