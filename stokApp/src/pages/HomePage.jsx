@@ -6,6 +6,7 @@ import GraphWidget from "../components/GraphWidget";
 import StockEntryForm from "../components/StockEntryForm";
 import WatchListHeader from "../components/WatchListHeader";
 import WatchListTable from "../components/WatchListTable";
+import Plotter from '../components/Plotter';
 
 function HomePage() {
   const [selectedSymbol, setSelectedSymbol] = useState("AAPL");
@@ -168,11 +169,10 @@ function HomePage() {
           <h1 className="text-3xl font-bold my-3 px-2 py-1 rounded-md text-violet-500">SimplyStocks</h1>
           <CurrentDate />
         </div>
-        <div
-          ref={widgetContainerRef}
-          className="tradingview-widget-container__widget rounded-md mb-2 max-h-96 overflow-auto"
-        ></div>
-        <GraphWidget symbol={selectedSymbol} />
+        <div>
+      <h1>Stock Data Visualization</h1>
+      <Plotter />
+    </div>
         <StockEntryForm
           stockSymbol={inputSymbol}
           setSymbol={setInputSymbol}
