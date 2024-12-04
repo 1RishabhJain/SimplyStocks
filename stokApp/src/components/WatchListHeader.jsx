@@ -3,7 +3,7 @@ import Button from "./ActionButton";
 
 export default function WatchlistHeader({ updateStocks, saveListToJSON }) {
   return (
-    <section className=" pt-16 w-full watchlist-header">
+    <section className="w-full watchlist-header">
       <hr className="mb-4" />
       <div className="flex justify-between items-center">
         <div>
