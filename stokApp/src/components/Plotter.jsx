@@ -17,6 +17,8 @@ const Plotter = ({ apikey, symbol }) => {
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [timeSeriesType, setTimeSeriesType] = useState('TIME_SERIES_DAILY');
+  //const [timeRange, setTimeRange] = useState('30d');
 
   // Base URL for the API
   const BASE_URL = "http://t12-env.eba-pkqpyn5m.us-east-2.elasticbeanstalk.com/";
@@ -25,7 +27,7 @@ const Plotter = ({ apikey, symbol }) => {
     const fetchStockData = async () => {
       try {
         // Construct the full URL with parameters
-        const url = `http://t12-env.eba-pkqpyn5m.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=TIME_SERIES_DAILY`;
+        const url = `http://t12-env.eba-pkqpyn5m.us-east-2.elasticbeanstalk.com/api/stockdata/${apikey}?symbol=${symbol}&function=${timeSeriesType}`;
         console.log(url);
         
         const response = await fetch(url, {
@@ -41,10 +43,35 @@ const Plotter = ({ apikey, symbol }) => {
         
         const data = await response.json();
         console.log(data);
+
+        const timeSeriesKey = {
+          TIME_SERIES_DAILY: 'Time Series (Daily)',
+          TIME_SERIES_WEEKLY: 'Weekly Time Series',
+          TIME_SERIES_MONTHLY: 'Monthly Time Series',
+        }[timeSeriesType];
+
+        // Determining whether it's pulling daily, weekly or monthly data
+        let timeSeries;
+        if (timeSeriesType === 'TIME_SERIES_DAILY') {
+          timeSeries = data['Time Series (Daily)'];
+        } 
+        else if (timeSeriesType === 'TIME_SERIES_WEEKLY') {
+          timeSeries = data['Weekly Time Series'];
+        }
+        else if (timeSeriesType === 'TIME_SERIES_MONTHLY') {
+          timeSeries = data['Monthly Time Series'];
+        }
+
         // Process data for chart rendering
-        const timeSeries = data['Time Series (Daily)'];
-        const dates = Object.keys(timeSeries).reverse(); // Dates in ascending order
-        const highValues = dates.map((date) => parseFloat(timeSeries[date]['4. close']));
+        const dates = Object.keys(timeSeries); // Loading the dates
+
+        const highValues = dates.map((date) => ({
+          date,
+          high: parseFloat(timeSeries[date]['2. high']),
+          low: parseFloat(timeSeries[date]['3. low']),
+          open: parseFloat(timeSeries[date]['1. open']),
+          close: parseFloat(timeSeries[date]['4. close']),
+        }));
 
         // Prepare chart data
         const chartData = {
@@ -52,12 +79,13 @@ const Plotter = ({ apikey, symbol }) => {
           datasets: [
             {
               label: 'High Prices',
-              data: highValues,
+              data: highValues.map((item) => item.high),
               borderColor: 'rgba(75,192,192,1)',
               backgroundColor: 'rgba(75,192,192,0.2)',
               tension: 0.4,
             },
           ],
+          meta: highValues,
         };
 
         setChartData(chartData);
@@ -69,8 +97,11 @@ const Plotter = ({ apikey, symbol }) => {
     };
 
     fetchStockData();
-  }, [apikey, symbol]);
+  }, [apikey, symbol, timeSeriesType]);
 
+  const handleTimeSeriesChange = (event) => {
+    setTimeSeriesType(event.target.value);
+  };
 
   const options = {
     responsive: true,
@@ -83,10 +114,13 @@ const Plotter = ({ apikey, symbol }) => {
           },
           label: (tooltipItem) => {
             const index = tooltipItem.dataIndex;
-            const date = chartData.labels[index];
-            const dataPoint = chartData.datasets[0].data[index];
+            const meta = chartData.meta[index];
+            //const dataPoint = chartData.datasets[0].data[index];
             return [
-              `High: $${dataPoint.toFixed(2)}`,
+              `High: $${meta.high.toFixed(2)}`,
+              `Low: $${meta.low.toFixed(2)}`,
+              `Open: $${meta.open.toFixed(2)}`,
+              `Close: $${meta.close.toFixed(2)}`,
             ];
           },
         },
@@ -105,7 +139,7 @@ const Plotter = ({ apikey, symbol }) => {
       y: {
         title: {
           display: true,
-          text: 'High Prices',
+          text: 'Prices',
         },
       },
     },
@@ -113,6 +147,16 @@ const Plotter = ({ apikey, symbol }) => {
 
   return (
     <div style={{ width: '100%', height: '500px' }}>
+      <div>
+        <label>
+          Date Range:
+          <select value={timeSeriesType} onChange={handleTimeSeriesChange}>
+            <option value="TIME_SERIES_DAILY">Daily</option>
+            <option value="TIME_SERIES_WEEKLY">Weekly</option>
+            <option value="TIME_SERIES_MONTHLY">Monthly</option>
+          </select>
+        </label>
+      </div>
       {loading && <p>Loading...</p>}
       {chartData && <Line data={chartData} options={options} />}
     </div>
