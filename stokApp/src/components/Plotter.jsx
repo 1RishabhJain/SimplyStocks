@@ -150,7 +150,8 @@ const Plotter = ({ apikey, symbol }) => {
       <div>
         <label>
           Date Range:
-          <select value={timeSeriesType} onChange={handleTimeSeriesChange}>
+          
+          <select className="p-0.5 pl-2 border border-gray-300 rounded mr-0.5 text-black" value={timeSeriesType} onChange={handleTimeSeriesChange}>
             <option value="TIME_SERIES_DAILY">Daily</option>
             <option value="TIME_SERIES_WEEKLY">Weekly</option>
             <option value="TIME_SERIES_MONTHLY">Monthly</option>
