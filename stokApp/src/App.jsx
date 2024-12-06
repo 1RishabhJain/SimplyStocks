@@ -1,10 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
-import CurrentDate from "./components/CurrentDate";
-import GraphWidget from "./components/GraphWidget";
-import StockEntryForm from "./components/StockEntryForm";
-import WatchListHeader from "./components/WatchListHeader";
-import WatchListTable from "./components/WatchListTable";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import PortfolioPage from "./pages/PortfolioPage";
@@ -24,10 +19,7 @@ function App() {
               <Link to="/home">Home</Link>
             </li>
             <li className="hover:text-violet-500 cursor-pointer">
-              <Link to="/portfolio">Portfolio</Link>
-            </li>
-            <li className="hover:text-violet-500 cursor-pointer">
-              <Link to="/account-settings">Account Settings</Link>
+              <Link to="/portfolio">Stock Comparison and Data</Link>
             </li>
           </ul>
         </nav>
@@ -38,7 +30,6 @@ function App() {
             <Route path="/" element={<LoginPage />} />
             <Route path="/home" element={<HomePage />} />
             <Route path="/portfolio" element={<PortfolioPage />} />
-            <Route path="/account-settings" element={<AccountSettingsPage />} />
           </Routes>
         </div>
       </div>

@@ -157,7 +157,7 @@ function HomePage() {
         ></div>
         <div>
           <h1>Stock Data Visualization</h1>
-          <Plotter apikey="demo" symbol={selectedSymbol} /> {/* Pass selectedSymbol */}
+          <Plotter apikey="AR8VLH8I12XTCBY0" symbol={selectedSymbol} /> {/* Pass selectedSymbol */}
         </div>
         <StockEntryForm
           stockSymbol={inputSymbol}
