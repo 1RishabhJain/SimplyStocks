@@ -1,8 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import Papa from "papaparse";
 import "./pages.css";
-import CurrentDate from "../components/CurrentDate";
-import GraphWidget from "../components/GraphWidget";
 import StockEntryForm from "../components/StockEntryForm";
 import WatchListHeader from "../components/WatchListHeader";
 import WatchListTable from "../components/WatchListTable";
